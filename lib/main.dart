@@ -1,3 +1,5 @@
+// @dart=3.0
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,7 +26,7 @@ class ClinicDashboardApp extends StatelessWidget {
       title: 'Clinic Control Dashboard',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // 1. Background & Primary Colors
+        useMaterial3: true, // Tells Flutter to use the latest design logic
         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF003A6C),
@@ -32,8 +34,8 @@ class ClinicDashboardApp extends StatelessWidget {
           surface: Colors.white,
         ),
         
-        // 2. Cards (White with 8.0 Radius)
-        cardTheme: CardTheme(
+        // Fix for the CardTheme error
+        cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
           shape: RoundedRectangleBorder(
@@ -41,11 +43,11 @@ class ClinicDashboardApp extends StatelessWidget {
           ),
         ),
 
-        // 3. Buttons (Ateneo Blue with 8.0 Radius - Flutter 3.0.1 safe)
+        // Fix for the 'primary' button error
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            primary: const Color(0xFF003A6C), 
-            onPrimary: Colors.white,           
+            backgroundColor: const Color(0xFF003A6C), // Changed from primary
+            foregroundColor: Colors.white,            // Changed from onPrimary
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
@@ -53,7 +55,6 @@ class ClinicDashboardApp extends StatelessWidget {
           ),
         ),
 
-        // 4. Text Fields (White background, 8.0 Radius)
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
@@ -132,7 +133,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   Future<void> _googleSignIn() async {
     try {
       await Supabase.instance.client.auth.signInWithOAuth(
-        Provider.google,
+        OAuthProvider.google,
         redirectTo: 'http://localhost:3000', // <-- ADD THIS LINE!
       );
     } catch (e) {
@@ -210,10 +211,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   // Email Field
                   TextField(
                     controller: _emailController,
+                    textInputAction: TextInputAction.next, // Shows "Next" on mobile keyboards
                     decoration: const InputDecoration(
                       labelText: 'Email', 
                       prefixIcon: Icon(Icons.email_outlined),
                     ),
+                    onSubmitted: (_) => FocusScope.of(context).nextFocus(), // Moves to password
                   ),
                   const SizedBox(height: 16),
                   
@@ -221,10 +224,13 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
+                    textInputAction: TextInputAction.done, // Shows "Done/Enter" on keyboard
                     decoration: const InputDecoration(
                       labelText: 'Password', 
                       prefixIcon: Icon(Icons.lock_outline),
                     ),
+                    // THIS IS THE MAGIC LINE:
+                    onSubmitted: (_) => _isLoading ? null : _signIn(), 
                   ),
                   const SizedBox(height: 24),
                   
@@ -409,7 +415,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             actions: [
               TextButton(onPressed: isSaving ? null : () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.grey))),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: const Color(0xFF003A6C)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
                 onPressed: isSaving ? null : () async {
                   if (selectedStudentId == null || complaintController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a student and enter a complaint.')));
@@ -464,7 +470,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 // --- NEW: The Update Record Form ---
   void _showUpdateDialog(Map<String, dynamic> record) {
     final diagnosisController = TextEditingController(text: record['diagnosis']);
-    bool isSaving = false;
+    bool isSaving = false; // Now we are going to use this!
 
     showDialog(
       context: context,
@@ -477,15 +483,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: const InputDecoration(labelText: 'Final Diagnosis', border: OutlineInputBorder()),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+              TextButton(
+                onPressed: isSaving ? null : () => Navigator.pop(context), 
+                child: const Text('Cancel')
+              ),
               ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: const Color(0xFF003A6C)),
-            onPressed: () {
-               // This launches the update form we just built!
-               _showUpdateDialog(record); 
-            },
-            child: const Text('Update Record'),
-          ),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
+                onPressed: isSaving ? null : () async {
+                  // 1. Start loading
+                  setDialogState(() => isSaving = true);
+                  
+                  try {
+                    // 2. Actually update the database
+                    await Supabase.instance.client
+                        .from('consultations')
+                        .update({'diagnosis': diagnosisController.text.trim()})
+                        .eq('id', record['id']);
+                    
+                    if (mounted) {
+                      Navigator.pop(context); // Close this dialog
+                      Navigator.pop(context); // Close the details popup behind it
+                      setState(() {
+                        _dashboardData = _fetchConsultations(); // Refresh the table
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Record updated!'), backgroundColor: Colors.green)
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red)
+                      );
+                    }
+                  } finally {
+                    // 3. Stop loading
+                    if (mounted) setDialogState(() => isSaving = false);
+                  }
+                },
+                child: isSaving 
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                  : const Text('Save Changes', style: TextStyle(color: Colors.white)),
+              ),
             ],
           );
         }
@@ -603,7 +642,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: const Text('Close', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: const Color(0xFF003A6C)),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
             onPressed: () {
                // This launches the update form!
                _showUpdateDialog(record); 
@@ -750,6 +789,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         return DataRow(
                           onSelectChanged: (selected) => _showDetailsDialog(record, studentName, displayDate),
+                          color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                            if (states.contains(WidgetState.hovered)) return Colors.blue.shade50; // Lights up on hover!
+                            return null; 
+                          }),
                           cells: [
                             DataCell(Text(displayDate)),
                             DataCell(Text(studentName, style: const TextStyle(fontWeight: FontWeight.w600))),
