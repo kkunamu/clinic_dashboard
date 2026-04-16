@@ -1,14 +1,12 @@
 // @dart=3.0
-
+// RAINZY BELLE CAÑADA!!! :3
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
-  // Ensure Flutter is ready before initializing Supabase
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Supabase with your partner's keys
   await Supabase.initialize(
     url: 'https://hapyyuyfdvgxyyomtlzs.supabase.co',
     anonKey: 'sb_publishable_slBMRFhuREJKxmyNamnglg_U2Qb2Hxo',
@@ -26,15 +24,13 @@ class ClinicDashboardApp extends StatelessWidget {
       title: 'Clinic Control Dashboard',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        useMaterial3: true, // Tells Flutter to use the latest design logic
+        useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF003A6C),
           primary: const Color(0xFF003A6C),
           surface: Colors.white,
         ),
-        
-        // Fix for the CardTheme error
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
@@ -42,19 +38,16 @@ class ClinicDashboardApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.0),
           ),
         ),
-
-        // Fix for the 'primary' button error
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF003A6C), // Changed from primary
-            foregroundColor: Colors.white,            // Changed from onPrimary
+            backgroundColor: const Color(0xFF003A6C),
+            foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
           ),
         ),
-
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
@@ -88,11 +81,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  // --- ADD THIS NEW LISTENER BLOCK ---
   @override
   void initState() {
     super.initState();
-    // This listens for Google sending you back with a success token
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.signedIn && data.session != null) {
         if (mounted) {
@@ -104,24 +95,24 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     });
   }
 
-  // Standard Email/Password Login
   Future<void> _signIn() async {
     setState(() => _isLoading = true);
+    
+    // Grab these before the async gap to satisfy the linter
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    
     try {
       await Supabase.instance.client.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
       
-      // SUCCESS! Kill the loading spinner and navigate to the Dashboard
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
-        );
-      }
-      
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+      );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
       );
     } finally {
@@ -129,15 +120,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     }
   }
 
-  // Google OAuth Login (for Web)
   Future<void> _googleSignIn() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
       await Supabase.instance.client.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: 'http://localhost:3000', // <-- ADD THIS LINE!
+        redirectTo: 'http://localhost:3000', 
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text('Google Sign-In Error: ${e.toString()}'), backgroundColor: Colors.red),
       );
     }
@@ -148,52 +139,43 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // 1. The Full-Screen Background Photo
           Container(
             decoration: BoxDecoration(
               color: const Color(0xFF003A6C),
               image: DecorationImage(
-                image: const AssetImage('assets/login_bg.jpg'), // Ensure this matches your filename!
+                image: const AssetImage('assets/login_bg.jpg'),
                 fit: BoxFit.cover,
+                // Fix #1: withValues instead of withOpacity
                 colorFilter: ColorFilter.mode(
-                  const Color(0xFF003A6C).withOpacity(0.4), 
+                  const Color(0xFF003A6C).withValues(alpha: 0.4), 
                   BlendMode.darken
                 ),
               ),
             ),
           ),
-
-          // 2. The Branding Text (Top Left)
           Positioned(
             top: 60,
             left: 60,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Clinic Control',
-                  style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  'ADDU HEALTH SERVICES',
-                  style: TextStyle(color: Colors.white70, fontSize: 14, letterSpacing: 2),
-                ),
+                const Text('Clinic Control', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold)),
+                const Text('ADDU HEALTH SERVICES', style: TextStyle(color: Colors.white70, fontSize: 14, letterSpacing: 2)),
               ],
             ),
           ),
-
-          // 3. The Floating Login Card (Right Side)
           Align(
-            alignment: const Alignment(0.6, 0), // Positions it slightly to the right
+            alignment: const Alignment(0.6, 0),
             child: Container(
               width: 450,
               padding: const EdgeInsets.all(40),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(24), // Large rounded corners like the ref
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    // Fix #1: withValues instead of withOpacity
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   )
@@ -207,34 +189,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   const SizedBox(height: 8),
                   const Text('Use your staff credentials to continue.', style: TextStyle(color: Colors.grey)),
                   const SizedBox(height: 32),
-                  
-                  // Email Field
                   TextField(
                     controller: _emailController,
-                    textInputAction: TextInputAction.next, // Shows "Next" on mobile keyboards
-                    decoration: const InputDecoration(
-                      labelText: 'Email', 
-                      prefixIcon: Icon(Icons.email_outlined),
-                    ),
-                    onSubmitted: (_) => FocusScope.of(context).nextFocus(), // Moves to password
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
+                    onSubmitted: (_) => FocusScope.of(context).nextFocus(), 
                   ),
                   const SizedBox(height: 16),
-                  
-                  // Password Field
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    textInputAction: TextInputAction.done, // Shows "Done/Enter" on keyboard
-                    decoration: const InputDecoration(
-                      labelText: 'Password', 
-                      prefixIcon: Icon(Icons.lock_outline),
-                    ),
-                    // THIS IS THE MAGIC LINE:
+                    textInputAction: TextInputAction.done, 
+                    decoration: const InputDecoration(labelText: 'Password', prefixIcon: Icon(Icons.lock_outline)),
                     onSubmitted: (_) => _isLoading ? null : _signIn(), 
                   ),
                   const SizedBox(height: 24),
-                  
-                  // Login Button
                   ElevatedButton(
                     onPressed: _isLoading ? null : _signIn,
                     child: _isLoading 
@@ -242,8 +211,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       : const Text('Login'),
                   ),
                   const SizedBox(height: 16),
-                  
-                  // Google Button
                   OutlinedButton.icon(
                     onPressed: _googleSignIn,
                     icon: const Icon(Icons.login),
@@ -263,7 +230,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 }
 
-// --- Make sure this part is here! ---
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -274,7 +240,9 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   late Future<List<dynamic>> _dashboardData;
   String _adminName = 'Loading...'; 
-  List<dynamic> _students = []; // <-- NEW: Holds our student list for the dropdown
+  String _adminEmail = 'Loading...';
+  String _adminRole = 'Loading...';  
+  List<dynamic> _students = []; 
   
   int _selectedIndex = 0; 
   String _searchQuery = '';
@@ -287,10 +255,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _dashboardData = _fetchConsultations();
     _fetchAdminProfile(); 
-    _fetchStudentsList(); // <-- NEW: Load the students right away!
+    _fetchStudentsList(); 
   }
 
-  // --- NEW: Get all students for our dropdown menu ---
   Future<void> _fetchStudentsList() async {
     try {
       final response = await Supabase.instance.client
@@ -307,7 +274,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<List<dynamic>> _fetchConsultations() async {
     final response = await Supabase.instance.client
         .from('consultations')
-        // We added 'id' and 'student_id' at the very beginning!
         .select('id, student_id, consultation_date, complaint, diagnosis, attending_staff, profiles(full_name), medications_dispensed(med_name, dosage, quantity), medical_certificates(file_url)')
         .order('consultation_date', ascending: false);
     return response as List<dynamic>;
@@ -319,7 +285,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (user != null) {
         final response = await Supabase.instance.client
             .from('profiles')
-            .select('full_name')
+            .select('full_name, role')
             .eq('id', user.id)
             .single(); 
         
@@ -327,16 +293,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
           setState(() {
             _adminName = response['full_name'] ?? 'Admin User';
             _nameController.text = _adminName;
+            _adminRole = (response['role'] ?? 'Unassigned').toString().toUpperCase();
+            _adminEmail = user.email ?? 'No email linked';
           });
         }
       }
     } catch (e) {
-      if (mounted) setState(() => _adminName = 'Clinic Staff');
+      if (mounted) {
+        setState(() {
+          _adminName = 'Clinic Staff';
+          _adminRole = 'STAFF';
+        });
+      }
     }
   }
 
   Future<void> _updateProfile() async {
     setState(() => _isUpdating = true);
+    
+    // Fix #4: Grab messenger before async gap
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
@@ -346,22 +323,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             .eq('id', user.id);
             
         setState(() => _adminName = _nameController.text.trim());
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: Colors.green));
+        scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: Colors.green));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red));
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _isUpdating = false);
     }
   }
 
-  // --- NEW: The "Create Data" Form ---
   void _showCreateConsultationDialog() {
     String? selectedStudentId;
     final complaintController = TextEditingController();
     final diagnosisController = TextEditingController();
     
-    // New Medication Fields
     final medNameController = TextEditingController();
     final medDosageController = TextEditingController();
     final medQtyController = TextEditingController();
@@ -387,7 +362,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const Divider(),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Select Student'),
-                      value: selectedStudentId,
+                      // Fix #3: value -> initialValue
+                      initialValue: selectedStudentId,
                       items: _students.map((s) => DropdownMenuItem<String>(value: s['id'], child: Text(s['full_name'] ?? 'Unknown'))).toList(),
                       onChanged: (val) => setDialogState(() => selectedStudentId = val),
                     ),
@@ -424,36 +400,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   
                   setDialogState(() => isSaving = true);
                   
+                  // Fix #4: Grab contexts before async gap
+                  final navigator = Navigator.of(context);
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  
                   try {
-                    // 1. Insert Consultation AND ask Supabase to return the new ID
                     final consultResponse = await Supabase.instance.client.from('consultations').insert({
                       'student_id': selectedStudentId,
                       'complaint': complaintController.text.trim(),
                       'diagnosis': diagnosisController.text.trim().isEmpty ? 'Pending' : diagnosisController.text.trim(),
                       'attending_staff': _adminName,
                       'consultation_date': DateTime.now().toIso8601String(),
-                    }).select('id').single(); // <-- The magic command to get the ID back!
+                    }).select('id').single(); 
 
                     final newConsultId = consultResponse['id'];
 
-                    // 2. If they typed a medication, insert it using the new ID!
                     if (medNameController.text.isNotEmpty) {
                       await Supabase.instance.client.from('medications_dispensed').insert({
-                        'consultation_id': newConsultId, // Links it to the consultation
-                        'student_id': selectedStudentId, // Links it to the student
+                        'consultation_id': newConsultId, 
+                        'student_id': selectedStudentId, 
                         'med_name': medNameController.text.trim(),
                         'dosage': medDosageController.text.trim().isEmpty ? 'N/A' : medDosageController.text.trim(),
                         'quantity': int.tryParse(medQtyController.text.trim()) ?? 1,
                       });
                     }
 
-                    if (mounted) {
-                      Navigator.pop(context);
-                      setState(() => _dashboardData = _fetchConsultations()); 
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Consultation recorded!'), backgroundColor: Colors.green));
-                    }
+                    navigator.pop();
+                    setState(() => _dashboardData = _fetchConsultations()); 
+                    scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Consultation recorded!'), backgroundColor: Colors.green));
+                    
                   } catch (e) {
-                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+                    scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
                   } finally {
                     setDialogState(() => isSaving = false);
                   }
@@ -467,10 +444,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-// --- NEW: The Update Record Form ---
   void _showUpdateDialog(Map<String, dynamic> record) {
     final diagnosisController = TextEditingController(text: record['diagnosis']);
-    bool isSaving = false; // Now we are going to use this!
+    bool isSaving = false; 
 
     showDialog(
       context: context,
@@ -490,35 +466,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
                 onPressed: isSaving ? null : () async {
-                  // 1. Start loading
                   setDialogState(() => isSaving = true);
                   
+                  // Fix #4: Grab contexts before async gap
+                  final navigator = Navigator.of(context);
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  
                   try {
-                    // 2. Actually update the database
                     await Supabase.instance.client
                         .from('consultations')
                         .update({'diagnosis': diagnosisController.text.trim()})
                         .eq('id', record['id']);
                     
-                    if (mounted) {
-                      Navigator.pop(context); // Close this dialog
-                      Navigator.pop(context); // Close the details popup behind it
-                      setState(() {
-                        _dashboardData = _fetchConsultations(); // Refresh the table
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Record updated!'), backgroundColor: Colors.green)
-                      );
-                    }
+                    navigator.pop(); 
+                    navigator.pop(); 
+                    setState(() {
+                      _dashboardData = _fetchConsultations(); 
+                    });
+                    scaffoldMessenger.showSnackBar(
+                      const SnackBar(content: Text('Record updated!'), backgroundColor: Colors.green)
+                    );
+                    
                   } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red)
-                      );
-                    }
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red)
+                    );
                   } finally {
-                    // 3. Stop loading
-                    if (mounted) setDialogState(() => isSaving = false);
+                    setDialogState(() => isSaving = false);
                   }
                 },
                 child: isSaving 
@@ -532,9 +506,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
- // --- UPGRADED POPUP: With Meds, Certs, AND the Update Button! ---
   void _showDetailsDialog(Map<String, dynamic> record, String studentName, String displayDate) {
-    // Safely extract the new data lists
     final List<dynamic> meds = record['medications_dispensed'] ?? [];
     final List<dynamic> certs = record['medical_certificates'] ?? [];
 
@@ -572,7 +544,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(record['complaint'] ?? 'No complaint recorded.', style: const TextStyle(fontSize: 15)),
                 const SizedBox(height: 24),
                 
-                // --- Medications Section ---
                 const Text('Medications Dispensed', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 if (meds.isEmpty) 
@@ -593,7 +564,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 
                 const SizedBox(height: 24),
 
-                // --- Medical Certificate Section ---
                 if (certs.isNotEmpty) ...[
                   const Text('Documents', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
@@ -602,15 +572,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       final String? urlString = certs[0]['file_url'];
                       if (urlString != null && urlString.isNotEmpty) {
                         final Uri url = Uri.parse(urlString);
-                      if (await canLaunchUrl(url)) {
+                        if (await canLaunchUrl(url)) {
                           await launchUrl(url, mode: LaunchMode.externalApplication); 
                         } else {
-                          if (mounted) {
+                          if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open the file link.'), backgroundColor: Colors.red));
                           }
                         }
                       } else {
-                        if (mounted) {
+                        if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No valid file URL found.')));
                         }
                       }
@@ -644,7 +614,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
             onPressed: () {
-               // This launches the update form!
                _showUpdateDialog(record); 
             },
             child: const Text('Update Record'),
@@ -653,10 +622,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // --- NEW: The Floating Action Button! ---
       floatingActionButton: _selectedIndex == 0 
         ? FloatingActionButton.extended(
             onPressed: _showCreateConsultationDialog,
@@ -664,7 +633,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             icon: const Icon(Icons.add, color: Colors.white),
             label: const Text('New Consultation', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           )
-        : null, // Hides the button when you go to "My Account"
+        : null, 
       
       body: Row(
         children: [
@@ -678,7 +647,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   radius: 40,
                   backgroundColor: Colors.white,
                   child: Text(
-                    _adminName != 'Loading...' ? _adminName[0].toUpperCase() : '?', 
+                    _adminName != 'Loading...' && _adminName.isNotEmpty ? _adminName[0].toUpperCase() : '?', 
                     style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF003A6C))
                   ),
                 ),
@@ -690,14 +659,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ListTile(
                   leading: Icon(Icons.medical_services, color: _selectedIndex == 0 ? Colors.white : Colors.white70),
                   title: Text('Consultations', style: TextStyle(color: _selectedIndex == 0 ? Colors.white : Colors.white70)),
-                  selectedTileColor: Colors.white.withOpacity(0.1),
+                  // Fix #1: withValues instead of withOpacity
+                  selectedTileColor: Colors.white.withValues(alpha: 0.1),
                   selected: _selectedIndex == 0,
                   onTap: () => setState(() => _selectedIndex = 0),
                 ),
                 ListTile(
                   leading: Icon(Icons.person_outline, color: _selectedIndex == 1 ? Colors.white : Colors.white70),
                   title: Text('My Account', style: TextStyle(color: _selectedIndex == 1 ? Colors.white : Colors.white70)),
-                  selectedTileColor: Colors.white.withOpacity(0.1),
+                  // Fix #1: withValues instead of withOpacity
+                  selectedTileColor: Colors.white.withValues(alpha: 0.1),
                   selected: _selectedIndex == 1,
                   onTap: () => setState(() => _selectedIndex = 1),
                 ),
@@ -707,7 +678,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   title: const Text('Logout', style: TextStyle(color: Colors.white70)),
                   onTap: () async {
                     await Supabase.instance.client.auth.signOut();
-                    if (mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const AdminLoginScreen()));
+                    if (mounted && context.mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const AdminLoginScreen()));
                   },
                 ),
                 const SizedBox(height: 16),
@@ -776,7 +747,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     width: double.infinity,
                     child: DataTable(
                       showCheckboxColumn: false,
-                      headingRowColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) => Colors.grey.shade100),
+                      // Fix #2: WidgetStateProperty
+                      headingRowColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) => Colors.grey.shade100),
                       columns: const [
                         DataColumn(label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
                         DataColumn(label: Text('Patient Name', style: TextStyle(fontWeight: FontWeight.bold))),
@@ -789,8 +761,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         return DataRow(
                           onSelectChanged: (selected) => _showDetailsDialog(record, studentName, displayDate),
+                          // Fix #2: WidgetStateProperty and WidgetState
                           color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
-                            if (states.contains(WidgetState.hovered)) return Colors.blue.shade50; // Lights up on hover!
+                            if (states.contains(WidgetState.hovered)) return Colors.blue.shade50; 
                             return null; 
                           }),
                           cells: [
@@ -812,41 +785,104 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildMyAccountView() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Account Settings', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 32),
-        SizedBox(
-          width: 500,
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Profile Information', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const Divider(height: 32),
-                  const Text('Display Name', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                  const SizedBox(height: 8),
-                  TextField(controller: _nameController, decoration: const InputDecoration(prefixIcon: Icon(Icons.person))),
-                  const SizedBox(height: 24),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: _isUpdating ? null : _updateProfile,
-                      child: _isUpdating 
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Save Changes'),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Account Settings', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 32),
+          SizedBox(
+            width: 600, 
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          // Fix #1: withValues instead of withOpacity
+                          backgroundColor: const Color(0xFF003A6C).withValues(alpha: 0.1),
+                          child: Text(
+                            _adminName != 'Loading...' && _adminName.isNotEmpty ? _adminName[0].toUpperCase() : '?', 
+                            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF003A6C))
+                          ),
+                        ),
+                        const SizedBox(width: 24),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_adminName, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF003A6C),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                _adminRole, 
+                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
-                  )
-                ],
+                    
+                    const SizedBox(height: 32),
+                    const Divider(),
+                    const SizedBox(height: 32),
+
+                    const Text('Account Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 24),
+
+                    const Text('Registered Email', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: TextEditingController(text: _adminEmail),
+                      readOnly: true, 
+                      style: const TextStyle(color: Colors.grey), 
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.email, color: Colors.grey),
+                        fillColor: Colors.grey.shade100, 
+                      )
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text('Display Name', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _nameController, 
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.person, color: Color(0xFF003A6C)),
+                        hintText: 'Enter your full name'
+                      )
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
+                        onPressed: _isUpdating ? null : _updateProfile,
+                        icon: _isUpdating 
+                            ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Icon(Icons.save, size: 18, color: Colors.white,),
+                        label: Text(_isUpdating ? 'Saving...' : 'Save Changes', style: const TextStyle(color: Colors.white)),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Clinic App (Official Server)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "-d",
+                "web-server",
+                "--web-port",
+                "3000"
+            ]
+        }
+    ]
+}
