@@ -5,7 +5,7 @@
             "name": "Clinic App (Official Server)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "debug",
+            "flutterMode": "release",
             "args": [
                 "-d",
                 "web-server",

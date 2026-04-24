@@ -1,8 +1,8 @@
 // @dart=3.0
-// RAINZY BELLE CAÑADA!!! :3
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:file_picker/file_picker.dart'; // <-- NEW PACKAGE!
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,26 +34,20 @@ class ClinicDashboardApp extends StatelessWidget {
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF003A6C),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -86,35 +80,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     super.initState();
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.signedIn && data.session != null) {
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const DashboardScreen()),
-          );
-        }
+        if (mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const DashboardScreen()));
       }
     });
   }
 
   Future<void> _signIn() async {
     setState(() => _isLoading = true);
-    
-    // Grab these before the async gap to satisfy the linter
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
-      await Supabase.instance.client.auth.signInWithPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      
-      navigator.pushReplacement(
-        MaterialPageRoute(builder: (context) => const DashboardScreen()),
-      );
+      await Supabase.instance.client.auth.signInWithPassword(email: _emailController.text.trim(), password: _passwordController.text.trim());
+      navigator.pushReplacement(MaterialPageRoute(builder: (context) => const DashboardScreen()));
     } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
-      );
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -123,14 +103,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   Future<void> _googleSignIn() async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
-      await Supabase.instance.client.auth.signInWithOAuth(
-        OAuthProvider.google,
-        redirectTo: 'http://localhost:3000', 
-      );
+      await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.google, redirectTo: 'http://localhost:3000');
     } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('Google Sign-In Error: ${e.toString()}'), backgroundColor: Colors.red),
-      );
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Google Sign-In Error: ${e.toString()}'), backgroundColor: Colors.red));
     }
   }
 
@@ -145,80 +120,55 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               image: DecorationImage(
                 image: const AssetImage('assets/login_bg.jpg'),
                 fit: BoxFit.cover,
-                // Fix #1: withValues instead of withOpacity
-                colorFilter: ColorFilter.mode(
-                  const Color(0xFF003A6C).withValues(alpha: 0.4), 
-                  BlendMode.darken
-                ),
+                colorFilter: ColorFilter.mode(const Color(0xFF003A6C).withValues(alpha: 0.4), BlendMode.darken),
               ),
             ),
           ),
           Positioned(
-            top: 60,
-            left: 60,
+            top: 60, left: 60,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Clinic Control', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold)),
-                const Text('ADDU HEALTH SERVICES', style: TextStyle(color: Colors.white70, fontSize: 14, letterSpacing: 2)),
+              children: const [
+                Text('Clinic Control', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold)),
+                Text('ADDU HEALTH SERVICES', style: TextStyle(color: Colors.white70, fontSize: 14, letterSpacing: 2)),
               ],
             ),
           ),
           Align(
             alignment: const Alignment(0.6, 0),
             child: Container(
-              width: 450,
-              padding: const EdgeInsets.all(40),
+              width: 450, padding: const EdgeInsets.all(40),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    // Fix #1: withValues instead of withOpacity
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  )
-                ],
+                color: Colors.white, borderRadius: BorderRadius.circular(24),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10))],
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text('Sign In', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   const Text('Use your staff credentials to continue.', style: TextStyle(color: Colors.grey)),
                   const SizedBox(height: 32),
                   TextField(
-                    controller: _emailController,
-                    textInputAction: TextInputAction.next,
+                    controller: _emailController, textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
                     onSubmitted: (_) => FocusScope.of(context).nextFocus(), 
                   ),
                   const SizedBox(height: 16),
                   TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    textInputAction: TextInputAction.done, 
+                    controller: _passwordController, obscureText: true, textInputAction: TextInputAction.done, 
                     decoration: const InputDecoration(labelText: 'Password', prefixIcon: Icon(Icons.lock_outline)),
                     onSubmitted: (_) => _isLoading ? null : _signIn(), 
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _signIn,
-                    child: _isLoading 
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                      : const Text('Login'),
+                    child: _isLoading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text('Login'),
                   ),
                   const SizedBox(height: 16),
                   OutlinedButton.icon(
-                    onPressed: _googleSignIn,
-                    icon: const Icon(Icons.login),
-                    label: const Text('Sign in with Google'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                    ),
+                    onPressed: _googleSignIn, icon: const Icon(Icons.login), label: const Text('Sign in with Google'),
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0))),
                   ),
                 ],
               ),
@@ -232,7 +182,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
-
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
@@ -260,11 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _fetchStudentsList() async {
     try {
-      final response = await Supabase.instance.client
-          .from('profiles')
-          .select('id, full_name')
-          .eq('role', 'student')
-          .order('full_name');
+      final response = await Supabase.instance.client.from('profiles').select('id, full_name').eq('role', 'student').order('full_name');
       if (mounted) setState(() => _students = response as List<dynamic>);
     } catch (e) {
       debugPrint('Error fetching students: $e');
@@ -274,7 +219,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<List<dynamic>> _fetchConsultations() async {
     final response = await Supabase.instance.client
         .from('consultations')
-        .select('id, student_id, consultation_date, complaint, diagnosis, attending_staff, profiles(full_name), medications_dispensed(med_name, dosage, quantity), medical_certificates(file_url)')
+        // UPDATED: Grabbed ID for meds and certs so we can update them later
+        .select('id, student_id, consultation_date, complaint, diagnosis, attending_staff, profiles(full_name), medications_dispensed(id, med_name, dosage, quantity), medical_certificates(id, file_url)')
         .order('consultation_date', ascending: false);
     return response as List<dynamic>;
   }
@@ -283,12 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
-        final response = await Supabase.instance.client
-            .from('profiles')
-            .select('full_name, role')
-            .eq('id', user.id)
-            .single(); 
-        
+        final response = await Supabase.instance.client.from('profiles').select('full_name, role').eq('id', user.id).single(); 
         if (mounted) {
           setState(() {
             _adminName = response['full_name'] ?? 'Admin User';
@@ -299,29 +240,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _adminName = 'Clinic Staff';
-          _adminRole = 'STAFF';
-        });
-      }
+      if (mounted) setState(() { _adminName = 'Clinic Staff'; _adminRole = 'STAFF'; });
     }
   }
 
   Future<void> _updateProfile() async {
     setState(() => _isUpdating = true);
-    
-    // Fix #4: Grab messenger before async gap
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
-        await Supabase.instance.client
-            .from('profiles')
-            .update({'full_name': _nameController.text.trim()})
-            .eq('id', user.id);
-            
+        await Supabase.instance.client.from('profiles').update({'full_name': _nameController.text.trim()}).eq('id', user.id);
         setState(() => _adminName = _nameController.text.trim());
         scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: Colors.green));
       }
@@ -332,15 +261,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  // --- UPLOAD HELPER METHOD ---
+  // --- UPLOAD HELPER METHOD (Upgraded for Error Tracking) ---
+  // --- UPLOAD HELPER METHOD (Upgraded with File Sanitization) ---
+  Future<String?> _uploadCertificate(PlatformFile file, String studentId) async {
+    if (file.bytes == null) {
+      throw Exception("The file data is empty. Please try selecting the file again.");
+    }
+    
+    // THE FIX: Clean the filename! Removes ñ, commas, spaces, etc.
+    final safeName = file.name.replaceAll(RegExp(r'[^a-zA-Z0-9\.\-]'), '_');
+    
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}_$safeName';
+    final filePath = '$studentId/$fileName'; 
+    
+    await Supabase.instance.client.storage.from('certificates').uploadBinary(filePath, file.bytes!);
+    return Supabase.instance.client.storage.from('certificates').getPublicUrl(filePath);
+  }
+
   void _showCreateConsultationDialog() {
     String? selectedStudentId;
     final complaintController = TextEditingController();
     final diagnosisController = TextEditingController();
-    
     final medNameController = TextEditingController();
     final medDosageController = TextEditingController();
     final medQtyController = TextEditingController();
     
+    PlatformFile? selectedFile; 
     bool isSaving = false;
 
     showDialog(
@@ -352,17 +299,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             title: const Text('New Consultation', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF003A6C))),
             content: SizedBox(
-              width: 450,
+              width: 500,
               child: SingleChildScrollView(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Patient Info', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF003A6C))),
-                    const Divider(),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Select Student'),
-                      // Fix #3: value -> initialValue
                       initialValue: selectedStudentId,
                       items: _students.map((s) => DropdownMenuItem<String>(value: s['id'], child: Text(s['full_name'] ?? 'Unknown'))).toList(),
                       onChanged: (val) => setDialogState(() => selectedStudentId = val),
@@ -371,17 +314,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     TextField(controller: complaintController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Chief Complaint')),
                     const SizedBox(height: 16),
                     TextField(controller: diagnosisController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Initial Diagnosis (Optional)')),
-                    
                     const SizedBox(height: 32),
+                    
                     const Text('Dispense Medication (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF003A6C))),
                     const Divider(),
-                    TextField(controller: medNameController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Medication Name (e.g., Paracetamol)')),
+                    TextField(controller: medNameController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Medication Name (e.g. Paracetamol)')),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: TextField(controller: medDosageController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Dosage (e.g., 500mg)'))),
+                        Expanded(child: TextField(controller: medDosageController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Dosage'))),
                         const SizedBox(width: 16),
-                        Expanded(child: TextField(controller: medQtyController, keyboardType: TextInputType.number, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Quantity (e.g., 2)'))),
+                        Expanded(child: TextField(controller: medQtyController, keyboardType: TextInputType.number, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Quantity'))),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+
+                    // --- FILE UPLOAD SECTION ---
+                    const Text('Medical Certificate (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF003A6C))),
+                    const Divider(),
+                    Row(
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            FilePickerResult? result = await FilePicker.pickFiles(
+                              type: FileType.custom, 
+                              allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg'],
+                              withData: true, // <--- ADD THIS MAGIC LINE!
+                            );
+                            if (result != null) setDialogState(() => selectedFile = result.files.first);
+                          },
+                          icon: const Icon(Icons.upload_file),
+                          label: const Text('Choose File'),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(child: Text(selectedFile?.name ?? 'No file selected', style: const TextStyle(color: Colors.grey), overflow: TextOverflow.ellipsis)),
                       ],
                     ),
                   ],
@@ -399,12 +365,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   }
                   
                   setDialogState(() => isSaving = true);
-                  
-                  // Fix #4: Grab contexts before async gap
                   final navigator = Navigator.of(context);
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
                   
                   try {
+                    // 1. Insert Consultation
                     final consultResponse = await Supabase.instance.client.from('consultations').insert({
                       'student_id': selectedStudentId,
                       'complaint': complaintController.text.trim(),
@@ -415,6 +380,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     final newConsultId = consultResponse['id'];
 
+                    // 2. Insert Medication
                     if (medNameController.text.isNotEmpty) {
                       await Supabase.instance.client.from('medications_dispensed').insert({
                         'consultation_id': newConsultId, 
@@ -423,6 +389,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         'dosage': medDosageController.text.trim().isEmpty ? 'N/A' : medDosageController.text.trim(),
                         'quantity': int.tryParse(medQtyController.text.trim()) ?? 1,
                       });
+                    }
+
+                    // 3. Upload & Insert Certificate
+                    if (selectedFile != null) {
+                      final publicUrl = await _uploadCertificate(selectedFile!, selectedStudentId!);
+                      if (publicUrl != null) {
+                        await Supabase.instance.client.from('medical_certificates').insert({
+                          'consultation_id': newConsultId,
+                          'student_id': selectedStudentId,
+                          'file_url': publicUrl,
+                        });
+                      }
                     }
 
                     navigator.pop();
@@ -446,6 +424,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _showUpdateDialog(Map<String, dynamic> record) {
     final diagnosisController = TextEditingController(text: record['diagnosis']);
+    
+    // Extract existing med details if they exist
+    final List<dynamic> meds = record['medications_dispensed'] ?? [];
+    final String? existingMedId = meds.isNotEmpty ? meds[0]['id'] : null;
+    final medNameController = TextEditingController(text: meds.isNotEmpty ? meds[0]['med_name'] : '');
+    final medDosageController = TextEditingController(text: meds.isNotEmpty ? meds[0]['dosage'] : '');
+    final medQtyController = TextEditingController(text: meds.isNotEmpty ? meds[0]['quantity'].toString() : '');
+
+    PlatformFile? selectedFile;
     bool isSaving = false; 
 
     showDialog(
@@ -453,51 +440,132 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Text('Update Diagnosis', style: TextStyle(color: Color(0xFF003A6C), fontWeight: FontWeight.bold)),
-            content: TextField(
-              controller: diagnosisController,
-              decoration: const InputDecoration(labelText: 'Final Diagnosis', border: OutlineInputBorder()),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: const Text('Update Medical Record', style: TextStyle(color: Color(0xFF003A6C), fontWeight: FontWeight.bold)),
+            content: SizedBox(
+              width: 500,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Diagnosis', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF003A6C))),
+                    const SizedBox(height: 8),
+                    TextField(controller: diagnosisController, decoration: const InputDecoration(labelText: 'Final Diagnosis', border: OutlineInputBorder())),
+                    const SizedBox(height: 24),
+
+                    const Text('Update Medications', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF003A6C))),
+                    const Divider(),
+                    TextField(controller: medNameController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Medication Name')),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(child: TextField(controller: medDosageController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Dosage'))),
+                        const SizedBox(width: 16),
+                        Expanded(child: TextField(controller: medQtyController, keyboardType: TextInputType.number, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Quantity'))),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text('Attach New Certificate', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF003A6C))),
+                    const Divider(),
+                    Row(
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            FilePickerResult? result = await FilePicker.pickFiles(
+                              type: FileType.custom, 
+                              allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg'],
+                              withData: true, // <--- ADD THIS MAGIC LINE!
+                            );
+                            if (result != null) setDialogState(() => selectedFile = result.files.first);
+                          },
+                          icon: const Icon(Icons.upload_file),
+                          label: const Text('Choose File'),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(child: Text(selectedFile?.name ?? 'No new file selected', style: const TextStyle(color: Colors.grey), overflow: TextOverflow.ellipsis)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
             actions: [
-              TextButton(
-                onPressed: isSaving ? null : () => Navigator.pop(context), 
-                child: const Text('Cancel')
-              ),
+              TextButton(onPressed: isSaving ? null : () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.grey))),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
-                onPressed: isSaving ? null : () async {
-                  setDialogState(() => isSaving = true);
-                  
-                  // Fix #4: Grab contexts before async gap
-                  final navigator = Navigator.of(context);
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  
-                  try {
-                    await Supabase.instance.client
-                        .from('consultations')
-                        .update({'diagnosis': diagnosisController.text.trim()})
-                        .eq('id', record['id']);
-                    
-                    navigator.pop(); 
-                    navigator.pop(); 
-                    setState(() {
-                      _dashboardData = _fetchConsultations(); 
-                    });
-                    scaffoldMessenger.showSnackBar(
-                      const SnackBar(content: Text('Record updated!'), backgroundColor: Colors.green)
-                    );
-                    
-                  } catch (e) {
-                    scaffoldMessenger.showSnackBar(
-                      SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red)
-                    );
-                  } finally {
-                    setDialogState(() => isSaving = false);
-                  }
+                onPressed: isSaving ? null : () {
+                  // --- SHOW THE STRICT WARNING CONFIRMATION ---
+                  showDialog(
+                    context: context,
+                    builder: (confirmContext) => AlertDialog(
+                      title: const Text('⚠️ Confirm Update', style: TextStyle(color: Color(0xFF003A6C), fontWeight: FontWeight.bold)),
+                      content: const Text('Are you sure these medical details and dispensed medications are correct?'),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(confirmContext), child: const Text('Review Again')),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
+                          onPressed: () async {
+                            Navigator.pop(confirmContext); // Close warning
+                            setDialogState(() => isSaving = true);
+                            
+                            final navigator = Navigator.of(context);
+                            final scaffoldMessenger = ScaffoldMessenger.of(context);
+                            
+                            try {
+                              // 1. Update Diagnosis
+                              await Supabase.instance.client.from('consultations')
+                                  .update({'diagnosis': diagnosisController.text.trim()}).eq('id', record['id']);
+                              
+                              // 2. Update or Insert Medication
+                              if (medNameController.text.isNotEmpty) {
+                                if (existingMedId != null) {
+                                  await Supabase.instance.client.from('medications_dispensed').update({
+                                    'med_name': medNameController.text.trim(),
+                                    'dosage': medDosageController.text.trim(),
+                                    'quantity': int.tryParse(medQtyController.text.trim()) ?? 1,
+                                  }).eq('id', existingMedId);
+                                } else {
+                                  await Supabase.instance.client.from('medications_dispensed').insert({
+                                    'consultation_id': record['id'],
+                                    'student_id': record['student_id'],
+                                    'med_name': medNameController.text.trim(),
+                                    'dosage': medDosageController.text.trim(),
+                                    'quantity': int.tryParse(medQtyController.text.trim()) ?? 1,
+                                  });
+                                }
+                              }
+
+                              // 3. Upload new file if added
+                              if (selectedFile != null) {
+                                final publicUrl = await _uploadCertificate(selectedFile!, record['student_id']);
+                                if (publicUrl != null) {
+                                  await Supabase.instance.client.from('medical_certificates').insert({
+                                    'consultation_id': record['id'],
+                                    'student_id': record['student_id'],
+                                    'file_url': publicUrl,
+                                  });
+                                }
+                              }
+                              
+                              navigator.pop(); // Close update form
+                              navigator.pop(); // Close details popup
+                              setState(() => _dashboardData = _fetchConsultations()); 
+                              scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Record updated successfully!'), backgroundColor: Colors.green));
+                              
+                            } catch (e) {
+                              scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+                            } finally {
+                              setDialogState(() => isSaving = false);
+                            }
+                          },
+                          child: const Text('Yes, Save Changes'),
+                        )
+                      ]
+                    )
+                  );
                 },
-                child: isSaving 
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                  : const Text('Save Changes', style: TextStyle(color: Colors.white)),
+                child: isSaving ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text('Save Changes'),
               ),
             ],
           );
@@ -506,14 +574,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // --- SECURE DELETE CONFIRMATION ---
+  void _confirmDelete(Map<String, dynamic> record) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('⚠️ WARNING', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+        content: const Text('ARE YOU SURE YOU WANT TO DELETE THIS MEDICAL RECORD? This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.grey))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              try {
+                await Supabase.instance.client.from('consultations').delete().eq('id', record['id']);
+                navigator.pop(); // close warning
+                navigator.pop(); // close details dialog
+                setState(() => _dashboardData = _fetchConsultations());
+                scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Record deleted.'), backgroundColor: Colors.red));
+              } catch (e) {
+                scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+              }
+            },
+            child: const Text('DELETE'),
+          )
+        ]
+      )
+    );
+  }
+
   void _showDetailsDialog(Map<String, dynamic> record, String studentName, String displayDate) {
-    final List<dynamic> meds = record['medications_dispensed'] ?? [];
-    final List<dynamic> certs = record['medical_certificates'] ?? [];
+    // Safety check just in case Supabase sends a Map instead of a List
+    List<dynamic> _safeList(dynamic item) {
+      if (item == null) return [];
+      if (item is List) return item;
+      return [item];
+    }
+    
+    final List<dynamic> meds = _safeList(record['medications_dispensed']);
+    final List<dynamic> certs = _safeList(record['medical_certificates']);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        // --- THIS FIXES THE CRASH: Pushes the delete button left, and the others right ---
+        actionsAlignment: MainAxisAlignment.spaceBetween, 
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -528,8 +636,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           width: 450, 
           child: SingleChildScrollView( 
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -575,22 +682,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         if (await canLaunchUrl(url)) {
                           await launchUrl(url, mode: LaunchMode.externalApplication); 
                         } else {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open the file link.'), backgroundColor: Colors.red));
-                          }
+                          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open the file link.'), backgroundColor: Colors.red));
                         }
                       } else {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No valid file URL found.')));
-                        }
+                        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No valid file URL found.')));
                       }
                     }, 
                     icon: const Icon(Icons.file_download, color: Color(0xFF003A6C)), 
                     label: const Text('View Medical Certificate', style: TextStyle(color: Color(0xFF003A6C))),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF003A6C)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                    ),
+                    style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF003A6C)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -607,17 +707,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(color: Colors.grey)),
+          // 1. The Dangerous Delete Button (Left Side)
+          TextButton.icon(
+            onPressed: () => _confirmDelete(record),
+            icon: const Icon(Icons.delete, color: Colors.red, size: 18),
+            label: const Text('Delete', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
-            onPressed: () {
-               _showUpdateDialog(record); 
-            },
-            child: const Text('Update Record'),
-          ),
+          
+          // 2. The Safe Actions (Right Side)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close', style: TextStyle(color: Colors.grey)),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
+                onPressed: () => _showUpdateDialog(record),
+                child: const Text('Update Record'),
+              ),
+            ],
+          )
         ],
       ),
     );
@@ -659,7 +771,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ListTile(
                   leading: Icon(Icons.medical_services, color: _selectedIndex == 0 ? Colors.white : Colors.white70),
                   title: Text('Consultations', style: TextStyle(color: _selectedIndex == 0 ? Colors.white : Colors.white70)),
-                  // Fix #1: withValues instead of withOpacity
                   selectedTileColor: Colors.white.withValues(alpha: 0.1),
                   selected: _selectedIndex == 0,
                   onTap: () => setState(() => _selectedIndex = 0),
@@ -667,7 +778,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ListTile(
                   leading: Icon(Icons.person_outline, color: _selectedIndex == 1 ? Colors.white : Colors.white70),
                   title: Text('My Account', style: TextStyle(color: _selectedIndex == 1 ? Colors.white : Colors.white70)),
-                  // Fix #1: withValues instead of withOpacity
                   selectedTileColor: Colors.white.withValues(alpha: 0.1),
                   selected: _selectedIndex == 1,
                   onTap: () => setState(() => _selectedIndex = 1),
@@ -747,7 +857,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     width: double.infinity,
                     child: DataTable(
                       showCheckboxColumn: false,
-                      // Fix #2: WidgetStateProperty
                       headingRowColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) => Colors.grey.shade100),
                       columns: const [
                         DataColumn(label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
@@ -761,7 +870,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         return DataRow(
                           onSelectChanged: (selected) => _showDetailsDialog(record, studentName, displayDate),
-                          // Fix #2: WidgetStateProperty and WidgetState
                           color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
                             if (states.contains(WidgetState.hovered)) return Colors.blue.shade50; 
                             return null; 
@@ -804,7 +912,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         CircleAvatar(
                           radius: 40,
-                          // Fix #1: withValues instead of withOpacity
                           backgroundColor: const Color(0xFF003A6C).withValues(alpha: 0.1),
                           child: Text(
                             _adminName != 'Loading...' && _adminName.isNotEmpty ? _adminName[0].toUpperCase() : '?', 
@@ -819,14 +926,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             const SizedBox(height: 4),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF003A6C),
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: Text(
-                                _adminRole, 
-                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)
-                              ),
+                              decoration: BoxDecoration(color: const Color(0xFF003A6C), borderRadius: BorderRadius.circular(100)),
+                              child: Text(_adminRole, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                             ),
                           ],
                         )
@@ -844,12 +945,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: TextEditingController(text: _adminEmail),
-                      readOnly: true, 
-                      style: const TextStyle(color: Colors.grey), 
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.email, color: Colors.grey),
-                        fillColor: Colors.grey.shade100, 
-                      )
+                      readOnly: true, style: const TextStyle(color: Colors.grey), 
+                      decoration: InputDecoration(prefixIcon: const Icon(Icons.email, color: Colors.grey), fillColor: Colors.grey.shade100)
                     ),
                     const SizedBox(height: 24),
 
@@ -857,10 +954,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: _nameController, 
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.person, color: Color(0xFF003A6C)),
-                        hintText: 'Enter your full name'
-                      )
+                      decoration: const InputDecoration(prefixIcon: Icon(Icons.person, color: Color(0xFF003A6C)), hintText: 'Enter your full name')
                     ),
                     
                     const SizedBox(height: 32),
@@ -870,9 +964,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF003A6C)),
                         onPressed: _isUpdating ? null : _updateProfile,
-                        icon: _isUpdating 
-                            ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                            : const Icon(Icons.save, size: 18, color: Colors.white,),
+                        icon: _isUpdating ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.save, size: 18, color: Colors.white,),
                         label: Text(_isUpdating ? 'Saving...' : 'Save Changes', style: const TextStyle(color: Colors.white)),
                       ),
                     )
